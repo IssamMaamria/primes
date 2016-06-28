@@ -51,10 +51,10 @@ public class DefaultPrimesService implements PrimesService{
             return Primality.COMPOSITE;
         }
         log.debug("Checking primality of {}", number);
-        Set<CompletableFuture<Pair<String, Primality>>> results = new HashSet<>();
+        Set<CompletableFuture<Primality>> results = new HashSet<>();
         primalityAlgorithms.forEach(algorithm -> {
-            CompletableFuture<Pair<String, Primality>> future =
-                    CompletableFuture.supplyAsync(() -> new Pair<>(algorithm.algorithmName(), algorithm.isProbablePrime(number, precision)), executor)
+            CompletableFuture<Primality> future =
+                    CompletableFuture.supplyAsync(() -> algorithm.isProbablePrime(number, precision), executor)
                             .whenComplete((primality, throwable) -> {
                                 if (throwable != null) {
                                     log.error("Primality check using algorithm " + algorithm.algorithmName() + " has failed.",
@@ -66,7 +66,7 @@ public class DefaultPrimesService implements PrimesService{
 
         CompletableFuture.allOf(results.toArray(new CompletableFuture[results.size()])).join();
 
-        Map<String, Primality> primalityMap = results.stream().filter(pairCompletableFuture -> !pairCompletableFuture.isCompletedExceptionally())
+        Set<Primality> primalities = results.stream().filter(pairCompletableFuture -> !pairCompletableFuture.isCompletedExceptionally())
                 .map(pairCompletableFuture -> {
                     try {
                         return pairCompletableFuture.get();
@@ -74,8 +74,8 @@ public class DefaultPrimesService implements PrimesService{
                         log.error(e.getMessage(), e);
                         throw new RuntimeException(e);
                     }
-                }).collect(Collectors.toMap(pair -> pair.first, pair -> pair.second));
-        return primalityMap.values().stream().allMatch(p->p == Primality.PRIME) ? Primality.PRIME : Primality.COMPOSITE;
+                }).collect(Collectors.toSet());
+        return primalities.stream().allMatch(p->p == Primality.PRIME) ? Primality.PRIME : Primality.COMPOSITE;
     }
 
     @Override
@@ -131,21 +131,6 @@ public class DefaultPrimesService implements PrimesService{
         } catch (InterruptedException|ExecutionException e) {
             log.error("Failed to calculate neighbours of "+ number, e);
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Customary pair.
-     * @param <U1> type of first
-     * @param <U2> type of second
-     */
-    private final class Pair<U1, U2> {
-        final U1 first;
-        final U2 second;
-
-        Pair(U1 first, U2 second){
-            this.first = first;
-            this.second = second;
         }
     }
 }
