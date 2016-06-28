@@ -9,9 +9,8 @@ import java.util.Random;
  */
 public class PrimalityUtils {
 
-    public static final String FERMAT_ALGORITHM = "Fermat";
-    public static final String MILLER_RABIN_ALGORITHM = "MillerRabin";
-    public static final String BASIC_PRIMALITY_TEST = "Basic";
+    static final String FERMAT_ALGORITHM = "Fermat";
+    static final String MILLER_RABIN_ALGORITHM = "MillerRabin";
 
     public static final BigInteger ZERO = BigInteger.ZERO;
     public static final BigInteger ONE = BigInteger.ONE;
@@ -22,7 +21,7 @@ public class PrimalityUtils {
         return number.mod(TWO).equals(ZERO);
     }
 
-    public static BigInteger uniformRandom(BigInteger bottom, BigInteger top){
+    static BigInteger uniformRandom(BigInteger bottom, BigInteger top){
         Random rnd = new Random();
         BigInteger result;
         do {

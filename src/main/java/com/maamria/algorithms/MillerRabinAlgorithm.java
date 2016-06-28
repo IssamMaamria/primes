@@ -9,6 +9,8 @@ import java.math.BigInteger;
 import static com.maamria.algorithms.PrimalityUtils.*;
 
 /**
+ * Implementation of Miller-Rabin primality checking algorithm.
+ *
  * @author maamria
  *         <p/> 26/06/2016
  */
@@ -18,6 +20,9 @@ public class MillerRabinAlgorithm implements PrimalityAlgorithm {
     @Override
     public Primality isProbablePrime(BigInteger number, int iterations) {
         Assert.notNull(number);
+        if(iterations < 1){
+            iterations = 1;
+        }
         if(number.compareTo(TWO) < 0){
             return Primality.NOT_APPLICABLE;
         }

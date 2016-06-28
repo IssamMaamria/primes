@@ -25,8 +25,10 @@ public class PrimesApplication extends WebMvcConfigurerAdapter implements AsyncC
 	@Override
 	public Executor getAsyncExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(8);
-		executor.setThreadNamePrefix("primes-thread");
+		int availableProcessors = Runtime.getRuntime().availableProcessors();
+		executor.setCorePoolSize(availableProcessors + 1);
+		executor.setMaxPoolSize(availableProcessors + 1);
+		executor.setThreadNamePrefix("primes-calc");
 		return executor;
 	}
 
